@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireSense - History</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body { background-color: #f8fafc; color: #1e293b; font-family: 'Inter', sans-serif; }
+        
+        .history-layout { padding: 40px 5%; max-width: 1400px; margin: 0 auto; }
+        
+        .page-header { margin-bottom: 30px; }
+        .page-header h1 { font-size: 2.2rem; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+        .page-header p { color: #64748b; font-size: 1.1rem; }
+
+        .history-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            padding: 20px 24px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: capitalize;
+        }
+
+        td {
+            padding: 20px 24px;
+            font-size: 0.95rem;
+            color: #475569;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: #f1f5f9;
+            color: #475569;
+            display: inline-block;
+        }
+
+        .score-text {
+            font-weight: 700;
+            color: #f97316; 
+        }
+
+        .download-btn {
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.2s;
+            font-size: 1.1rem;
+        }
+        .download-btn:hover { color: #0f172a; }
+
+        .empty-history {
+            padding: 60px;
+            text-align: center;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">HireSense</div>
+        <div class="nav-links">
+            <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{% url 'ats_check' %}" class="{% if request.resolver_match.url_name == 'ats_check' %}active{% endif %}">Resume Analyzer</a>
+            <a href="{% url 'compare' %}" class="{% if request.resolver_match.url_name == 'compare' %}active{% endif %}">Job Matcher</a>
+            <a href="{% url 'history' %}" class="{% if request.resolver_match.url_name == 'history' %}active{% endif %}">History</a>
+            <a href="{% url 'about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a>
+        </div>
+        <div class="nav-links">    
+            <a href="{% url 'login' %}" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+
+    <div class="container history-layout">
+        <header class="page-header">
+            <h1>History</h1>
+            <p>All your past resume checks and job matches.</p>
+        </header>
+
+        <div class="history-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Date</th>
+                        <th style="width: 20%;">Action</th>
+                        <th style="width: 10%;">Score</th>
+                        <th style="width: 45%;">Title</th>
+                        <th style="width: 10%; text-align: right;">Download</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if history_items %}
+                        {% for item in history_items %}
+                        <tr>
+                            <td>{{ item.created_at|date:"d M Y, H:i" }}</td>
+                            <td><span class="badge">{{ item.get_action_display }}</span></td>
+                            <td><span class="score-text">{{ item.score }}%</span></td>
+                            <td>{{ item.title }}</td>
+                            <td style="text-align: right;">
+                                {% if item.resume and item.resume.resume_file %}
+                                    <a href="{{ item.resume.resume_file.url }}" class="download-btn">
+                                        <i class="fas fa-file-alt"></i>
+                                    </a>
+
+                                {% elif item.jd and item.jd.Jd_file %}
+                                    <a href="{{ item.jd.Jd_file.url }}" class="download-btn">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td>5/5/2026</td>
+                            <td><span class="badge">Resume Check</span></td>
+                            <td><span class="score-text">72%</span></td>
+                            <td>Business Operations & Strategy resume</td>
+                            <td style="text-align: right;"><a href="#" class="download-btn"><i class="fas fa-download"></i></a></td>
+                        </tr>
+                        <tr>
+                            <td>5/5/2026</td>
+                            <td><span class="badge">Resume Check</span></td>
+                            <td><span class="score-text">45%</span></td>
+                            <td>Creative Arts & Media resume</td>
+                            <td style="text-align: right;"><a href="#" class="download-btn"><i class="fas fa-download"></i></a></td>
+                        </tr>
+                        <tr>
+                            <td>5/5/2026</td>
+                            <td><span class="badge">Job Match</span></td>
+                            <td><span class="score-text">75%</span></td>
+                            <td>Junior Business Analyst</td>
+                            <td style="text-align: right;"><a href="#" class="download-btn"><i class="fas fa-download"></i></a></td>
+                        </tr>
+                        <tr>
+                            <td>5/5/2026</td>
+                            <td><span class="badge">Resume Check</span></td>
+                            <td><span class="score-text">72%</span></td>
+                            <td>Information Technology / Software Development resume</td>
+                            <td style="text-align: right;"><a href="#" class="download-btn"><i class="fas fa-download"></i></a></td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,261 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HireSense - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">HireSense</div>
+        <div class="nav-links">
+            <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{% url 'ats_check' %}" class="{% if request.resolver_match.url_name == 'ats_check' %}active{% endif %}">Resume Analyzer</a>
+            <a href="{% url 'compare' %}" class="{% if request.resolver_match.url_name == 'compare' %}active{% endif %}">Job Matcher</a>
+            <a href="{% url 'history' %}" class="{% if request.resolver_match.url_name == 'history' %}active{% endif %}">History</a>
+            <a href="{% url 'about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a>
+        </div>
+        <div class="nav-links">    
+            <a href="{% url 'login' %}" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+<style>
+    .hero-section {
+        background-color: #f8fafc;
+        padding: 80px 10%;
+        text-align: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .dashboard-header {
+        text-align: center; 
+        margin-bottom: 30px; 
+    }
+
+    .dashboard-header p {
+        margin-bottom: 0; 
+    }
+
+    .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px; 
+    }
+
+    .card {
+        background: white;
+        padding: 25px 20px; 
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+        text-align: left;
+        transition: all 0.3s ease;
+    }
+
+    .card h3 {
+        font-size: 1.1rem; 
+        margin: 15px 0 10px;
+    }
+
+    .card p {
+        font-size: 0.9rem; 
+        line-height: 1.5;
+        color: #64748b;
+    }
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 10px 25px rgba(240, 84, 84, 0.1);
+        border-color: #f05454; 
+    }
+
+    .card:hover .icon-bg {
+        background-color: #f05454; 
+        transition: background-color 0.3s ease;
+    }
+
+    .card:hover .icon-bg i {
+        color: #ffffff; 
+        transition: color 0.3s ease;
+    }
+
+    .icon-bg {
+        width: 45px; 
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: #fff5f0;
+        color: #f05454;
+        transition: all 0.3s ease;
+    }
+
+    .icon-bg i {
+        font-size: 1.2rem;
+    }
+
+    .ai-tag {
+        display: inline-flex;
+        align-items: center;
+        background: #fff5f0;
+        color: #f05454;
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 20px;
+        border: 1px solid #ffe4d6;
+    }
+
+    .ai-tag i { margin-right: 8px; }
+
+    .hero-title { 
+        font-size: 4.5rem; 
+        color: #0f172a; 
+        margin: 0; 
+        font-weight: 800; 
+    }
+
+    .hero-subtitle { 
+        font-size: 1.8rem; 
+        color: #475569; 
+        margin: 10px 0 25px; 
+        font-weight: 500; 
+    }
+
+    .hero-description { 
+        max-width: 750px; 
+        margin: 0 auto 35px; 
+        color: #64748b; 
+        line-height: 1.7; 
+        font-size: 1.1rem; 
+    }
+
+    .hero-features {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 45px;
+        font-weight: 500;
+        color: #475569;
+    }
+
+    .hero-features span {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1rem;
+    }   
+
+    .hero-btns { 
+        display: flex; 
+        gap: 20px; 
+        justify-content: center; 
+    }
+
+    .btn-hero {
+        padding: 15px 30px;
+        border-radius: 10px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-hero:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-blue {
+        background: #1e293b;
+        color: white;
+        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-white {
+        background: white;
+        color: #1e293b;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+</style>
+
+    <header class="hero-section">
+        <div class="ai-tag">
+            <i class="fas fa-wand-magic-sparkles"></i> AI-Powered Hiring Platform
+        </div>
+        <h1 class="hero-title">HireSense</h1>
+        <h2 class="hero-subtitle">Intelligent Resume Screening & ATS</h2>
+        <p class="hero-description">
+            Eliminate manual screening and subjective bias. HireSense uses <strong>Natural Language Processing (NLP)</strong> 
+            and <strong>Machine Learning</strong> to evaluate candidate suitability with speed and precision.
+        </p>
+        <div class="hero-features">
+                <span>🚀 Reduced Workload</span>
+                <span>🎯 Improved Accuracy</span>
+                <span>⚖️ Objective Selection</span>
+        </div>
+        <div class="hero-btns">
+            <a href="{% url 'ats_check' %}" class="btn-hero btn-blue">
+                Check Resume Quality <i class="fas fa-arrow-right"></i>
+            </a>
+            <a href="{% url 'compare' %}" class="btn-hero btn-white">
+                Find Job Fit <i class="fas fa-briefcase"></i>
+            </a>
+        </div>
+    </header>
+
+    <section class="container" style="padding: 60px 10%;">
+        <div class="dashboard-header" style="text-align:center; margin-bottom:50px;">
+            <h2 style="font-size: 2.2rem; color: #1a1a2e; margin-bottom: 10px;">Why Choose HireSense</h2>
+            <p style="color: #666; font-size: 1.1rem;">Everything you need for optimal resume screening and job matching.</p>
+        </div>
+        <div class="grid-3">
+
+            <div class="card">
+                <div class="icon-bg"><i class="fas fa-brain"></i></div>
+                <h3>AI-Powered Resume Analysis</h3>
+                <p>Analyze resumes using machine learning to evaluate ATS compatibility and improve selection chances.</p>
+            </div>
+
+            <div class="card">
+                <div class="icon-bg"><i class="fas fa-bullseye"></i></div>
+                <h3>Industry-Based Scoring</h3>
+                <p>Automatically detects user industry from skills and provides tailored ATS scoring.</p>
+            </div>
+
+            <div class="card">
+                <div class="icon-bg"><i class="fas fa-file-invoice"></i></div>
+                <h3>Smart Skill Extraction</h3>
+                <p>Extracts relevant skills from resumes and compares them with job requirements.</p>
+            </div>
+
+            <div class="card">
+                <div class="icon-bg"><i class="fas fa-briefcase"></i></div>
+                <h3>Job Matching System</h3>
+                <p>Matches resumes with job descriptions using similarity scoring and JD analysis.</p>
+            </div>
+
+            <div class="card">
+                <div class="icon-bg"><i class="fas fa-lightbulb"></i></div>
+                <h3>Resume Improvements</h3>
+                <p>Identifies missing skills and provides actionable suggestions to enhance resumes.</p>
+            </div>
+
+            <div class="card">
+                <div class="icon-bg"><i class="fas fa-bolt"></i></div>
+                <h3>Fast & Accurate Results</h3>
+                <p>Instant analysis with high accuracy using TF-IDF and similarity algorithms.</p>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

@@ -1,0 +1,262 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HireSense - Resume Analyzer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">HireSense</div>
+        <div class="nav-links">
+            <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{% url 'ats_check' %}" class="{% if request.resolver_match.url_name == 'ats_check' %}active{% endif %}">Resume Analyzer</a>
+            <a href="{% url 'compare' %}" class="{% if request.resolver_match.url_name == 'compare' %}active{% endif %}">Job Matcher</a>
+            <a href="{% url 'history' %}" class="{% if request.resolver_match.url_name == 'history' %}active{% endif %}">History</a>
+            <a href="{% url 'about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a>
+        </div>
+        <div class="nav-links">    
+            <a href="{% url 'login' %}" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+
+    <div class="container main-layout">
+        <header class="page-header">
+            <h1>Resume Analyzer</h1>
+            <p>Upload your resume for AI-powered ATS scoring and improvements.</p>
+        </header>
+
+        <div class="analyzer-grid">
+            <div class="column-group">
+                <div class="analyzer-card">
+                    <h3>Upload Resume</h3>
+                    <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                        {% csrf_token %}
+                        <div class="drop-zone" id="dropZone" onclick="document.getElementById('resumeFile').click();">
+                            <div class="drop-zone-content">
+                                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                <p class="drop-text">Drag your resume here</p>
+                                <span class="or-text">or</span>
+                                <button type="button" class="btn-browse">Browse File</button>
+                                <p class="file-info">.pdf, .doc, .docx supported</p>
+                                <p id="fileName" class="selected-file-name"></p>
+                            </div>
+                            <input type="file" id="resumeFile" name="resume" accept=".pdf,.doc,.docx" hidden>
+                        </div>
+                        <button type="submit" class="btn-analyze">
+                            <i class="fas fa-wand-magic-sparkles"></i> Analyze Resume
+                        </button>
+                    </form>
+                </div>
+
+                <div class="analyzer-card result-card">
+                    <h3><i class="fas fa-chart-line"></i>Analysis Results</h3>
+                    {% if score %}
+                        <div class="score-display">
+                            <div class="score-circle">
+                                <span class="score-num">{{ score }}%</span>
+                                <span class="score-text">ATS Score</span>
+                            </div>
+                        </div>
+                        <div class="results-details">
+                            <p><strong><i class="fas fa-check-circle" style="color: #22c55e;"></i> Matched Skills:</strong> {{ matched }}</p>
+                            <p><strong><i class="fas fa-times-circle" style="color: #ef4444;"></i> Missing Skills:</strong> {{ missing }}</p>
+                            <div class="suggestion-box">
+                                <strong><i class="fas fa-lightbulb"></i> AI Suggestions:</strong>
+                                <p>{{ suggestions }}</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <p>No analysis yet. Upload and analyze to see results.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="analyzer-card">
+                <h3><i class="fas fa-magic" style="color: #f97316;"></i> Improved Resume</h3>
+                <div class="preview-area" id="resume-download-area">
+                    {% if resume_html %}
+                        <div class="resume-paper" id="resumeContent">
+                            {{ resume_html|safe }}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-file-invoice empty-icon"></i>
+                            <p>Your improved resume will appear here</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="action-footer">
+                    <button onclick="generatePDF()" class="btn-download primary" {% if not resume_html %}disabled{% endif %}>
+                        <i class="fas fa-file-pdf"></i> Download PDF
+                    </button>
+                    <button onclick="window.print()" class="btn-download outline" {% if not score %}disabled{% endif %}>
+                        <i class="fas fa-print"></i> Print Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById("resumeFile");
+        const fileNameDisplay = document.getElementById("fileName");
+        const dropZone = document.getElementById("dropZone");
+
+        fileInput.addEventListener("change", function () {
+            if (this.files[0]) {
+                fileNameDisplay.innerText = "📄 " + this.files[0].name;
+                dropZone.classList.add("file-selected");
+            }
+        });
+
+        function generatePDF() {
+            const element = document.getElementById('resumeContent');
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5], // top, left, bottom, right
+                filename: 'Improved_Resume.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0, x: 0, windowWidth: element.offsetWidth},
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+
+    <style>
+        body { background-color: #f8fafc; color: #1e293b; font-family: 'Inter', sans-serif; }
+        .main-layout { padding: 40px 5%; }
+        .page-header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 5px; color: #0f172a; }
+        .page-header p { color: #64748b; margin-bottom: 30px; }
+
+        .analyzer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 25px;
+            align-items: start;
+        }
+
+        .column-group { display: flex; flex-direction: column; gap: 20px; }
+
+        .analyzer-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .result-card { min-height: auto; }
+
+        .drop-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fdfdfd;
+        }
+        .drop-zone:hover { border-color: #94a3b8; background: #f8fafc; }
+        .drop-zone.file-selected { border-color: #2563eb; background: #eff6ff; }
+        .upload-icon { font-size: 2.5rem; color: #94a3b8; margin-bottom: 10px; }
+
+        .btn-analyze {
+            width: 100%;
+            background: #1e293b;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-top: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .score-display { text-align: center; margin: 15px 0; }
+        .score-circle {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 4px solid #22c55e;
+            background: #f0fdf4;
+        }
+        .score-num { font-size: 1.4rem; font-weight: 800; color: #166534; }
+        .score-text { font-size: 0.6rem; text-transform: uppercase; color: #166534; }
+
+        .suggestion-box {
+            background: #fffbeb;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #f59e0b;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+
+        .preview-area {
+            flex-grow: 1;
+            border: 1px solid #f1f5f9;
+            border-radius: 8px;
+            background: #fafafa;
+            overflow-y: auto;
+            max-height: 600px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .resume-paper {
+            background: white;
+            width: 100%;
+            padding: 30px;
+            text-align: left;
+            color: #333;
+            font-family: serif;
+            line-height: 1.6;
+        }
+
+        #resumeContent {
+            min-height: 1056px; 
+            height: auto;
+            overflow: visible !important;
+        }
+
+        @media print {
+            .resume-paper {
+                padding: 0.5in !important;
+                box-shadow: none;
+            }
+        }
+
+        .action-footer { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-download {
+            flex: 1; padding: 12px; border-radius: 8px; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-download.primary { background: #2563eb; color: white; border: none; }
+        .btn-download.outline { background: white; color: #475569; border: 1px solid #e2e8f0; }
+        .btn-download:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .empty-state { text-align: center; color: #94a3b8; padding: 40px; }
+        .empty-icon { font-size: 3rem; opacity: 0.2; margin-bottom: 10px; }
+    </style>
+</body>
+</html>
