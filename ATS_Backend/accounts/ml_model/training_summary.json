@@ -1,0 +1,21 @@
+{
+  "best_regressor": "Extra Trees",
+  "best_classifier": "RF Classifier",
+  "confusion_matrix": [
+    [
+      29,
+      17,
+      9
+    ],
+    [
+      61,
+      53,
+      41
+    ],
+    [
+      30,
+      41,
+      119
+    ]
+  ]
+}
