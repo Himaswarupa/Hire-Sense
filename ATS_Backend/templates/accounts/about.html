@@ -1,0 +1,228 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>About HireSense</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --accent: #f05454;
+            --accent-light: #fceceb;
+            --text-muted: #666;
+            --border: #e0e6ed;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #f4f7f6;
+            color: var(--primary);
+        }
+
+        .navbar {
+            background-color: var(--primary);
+            padding: 1rem 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        .logo { font-size: 1.6rem; font-weight: bold; color: var(--accent); }
+        .nav-links a {
+            color: #e9ecef;
+            text-decoration: none;
+            margin-left: 25px;
+            font-weight: 500;
+        }
+        .nav-links a.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+
+        .container { 
+            padding: 30px 8% 60px; 
+            max-width: 1400px; 
+            margin: 0 auto; 
+        }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 5px; font-weight: 800; }
+        header p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 35px; }
+
+        .section-title { margin-bottom: 25px; font-size: 1.8rem; font-weight: 700; }
+
+        .about-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .step-card {
+            background: white;
+            padding: 30px 20px; 
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            position: relative;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .icon-bg {
+            width: 50px;
+            height: 50px;
+            background: var(--accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .icon-bg i {
+            color: var(--accent);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 25px rgba(240, 84, 84, 0.1);
+        }
+
+        .step-card:hover .icon-bg {
+            background: var(--accent); 
+        }
+
+        .step-card:hover .icon-bg i {
+            color: white; 
+        }
+
+        .step-num {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent-light);
+            transition: color 0.3s ease;
+        }
+
+        .step-card:hover .step-num {
+            color: #fceceb; 
+        }
+
+        .step-card h3 { font-size: 1.25rem; margin: 10px 0; transition: color 0.3s ease; }
+        .step-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* WHO CAN USE SECTION */
+        .user-cards-container {
+            display: flex;
+            justify-content: left; 
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .user-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: 0.3s;
+            width: 260px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .user-card i { font-size: 2rem; color: var(--accent); margin-bottom: 15px; display: block; }
+        .user-card p { font-weight: 600; color: var(--primary); }
+
+        @media (max-width: 1100px) {
+            .about-grid-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 600px) {
+            .about-grid-4 { grid-template-columns: 1fr; }
+            .user-cards-container { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">HireSense</div>
+        <div class="nav-links">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'ats_check' %}">Resume Analyzer</a>
+            <a href="{% url 'compare' %}">Job Matcher</a>
+            <a href="{% url 'history' %}">History</a>
+            <a href="{% url 'about' %}" class="active">About</a>
+        </div>
+        <div class="nav-links">    
+            <a href="{% url 'login' %}" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>About HireSense</h1>
+            <p>Your intelligent companion for modern recruitment and career growth.</p>
+        </header>
+
+        <section>
+            <h2 class="section-title">How it Works</h2>
+            <div class="about-grid-4">
+                <!-- Step 01 -->
+                <div class="step-card">
+                    <span class="step-num">01</span>
+                    <div class="icon-bg"><i class="fas fa-upload"></i></div>
+                    <h3>Upload Resume</h3>
+                    <p>Drop your file in seconds. We support PDF, DOCX, and text formats.</p>
+                </div>
+                <!-- Step 02 -->
+                <div class="step-card">
+                    <span class="step-num">02</span>
+                    <div class="icon-bg"><i class="fas fa-brain"></i></div>
+                    <h3>AI Analyzes</h3>
+                    <p>Our NLP engine breaks down skills, experience, and formatting.</p>
+                </div>
+                <!-- Step 03 -->
+                <div class="step-card">
+                    <span class="step-num">03</span>
+                    <div class="icon-bg"><i class="fas fa-file-alt"></i></div>
+                    <h3>Get ATS Score</h3>
+                    <p>Receive an industry-standard score and actionable improvement tips.</p>
+                </div>
+                <!-- Step 04 -->
+                <div class="step-card">
+                    <span class="step-num">04</span>
+                    <div class="icon-bg"><i class="fas fa-file-contract"></i></div>
+                    <h3>Find Job Fit</h3>
+                    <p>Instantly compare your profile against specific job descriptions.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title" style="text-align: left;">Who Can Use</h2>
+            <div class="user-cards-container">
+                <div class="user-card">
+                    <i class="fas fa-user-graduate"></i>
+                    <p>Students</p>
+                </div>
+                <div class="user-card">
+                    <i class="fas fa-briefcase"></i>
+                    <p>Freshers</p>
+                </div>
+                <div class="user-card">
+                    <i class="fas fa-laptop-code"></i>
+                    <p>Placement Cells</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
